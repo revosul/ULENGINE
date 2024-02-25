@@ -48,6 +48,9 @@ end
 
 function love.draw()
     
+    -- background
+    love.graphics.draw(love.graphics.newImage("background.png"), 15, 15)
+
     -- buttons
     love.graphics.draw(love.graphics.newImage("1false.png"), 33, 431)
     love.graphics.draw(love.graphics.newImage("0false.png"), 187, 431)

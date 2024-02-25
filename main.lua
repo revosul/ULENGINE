@@ -2,7 +2,7 @@ local namefont = {font = love.graphics.newFont("mnc.ttf", 24), color = {1, 1, 1}
 local hpfont = {font = love.graphics.newFont("hp.ttf", 10), color = {1, 1, 1}}
 local player = {x = 320, y = 240, image = love.graphics.newImage("playersoul.png"), name = ("chara"), lv = ("19"), hp = (92), mhp = (92), kr = (1)} -- this is the player
 local targetFPS, targetx, targetexpression, targettorsoexpress, targetlegsexpress, targetsweat = 30, 320, "wince", "idle", "idle", "2" -- some things got mixed in here, but its the fps and enemy expression stuff
-local frame = {x = 33, y = 250, width = 575, height = 140, thickness = 5} -- this is the box
+local frame = {x = 32, y = 250, width = 577, height = 140, thickness = 5} -- this is the box
 
 function love.load()
     love.window.setMode(640, 480) -- size of game window

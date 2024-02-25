@@ -1,12 +1,14 @@
 local namefont = {font = love.graphics.newFont("mnc.ttf", 24), color = {1, 1, 1}} -- font of the name under the box (you know what im talking about)
 local hpfont = {font = love.graphics.newFont("hp.ttf", 10), color = {1, 1, 1}}
-local player = {x = 320, y = 240, image = love.graphics.newImage("playersoul.png"), name = ("chara"), lv = ("19"), hp = (92), mhp = (92), kr = (1)} -- this is the player
+local player = {x = 320, y = 240, image = love.graphics.newImage("playersoul.png"), name = ("chara"), lv = ("19"), hp = (92), mhp = (92), kr = (1), buttonselected = 0} -- this is the player
 local targetFPS, targetx, targetexpression, targettorsoexpress, targetlegsexpress, targetsweat = 30, 320, "wince", "idle", "idle", "2" -- some things got mixed in here, but its the fps and enemy expression stuff
 local frame = {x = 32, y = 250, width = 577, height = 140, thickness = 5} -- this is the box
+local currentscene = 1
+local keyDownMenu = {left = false, right = false}
 
 function love.load()
     love.window.setMode(640, 480) -- size of game window
-    love.window.setTitle("ulengine") -- title of the window
+    love.window.setTitle("luaengine") -- title of the window
     love.graphics.setDefaultFilter("nearest", "nearest") -- to make sure the pixilart doesnt blur
 end
 
@@ -14,25 +16,58 @@ function love.update(dt)
     -- Limit frame rate to 60 FPS
     love.timer.sleep(1 / targetFPS - dt)
 
-    -- Player movement
-    local speedModifier = love.keyboard.isDown("x") and 2 or 1
-    local dx, dy = (love.keyboard.isDown("right") and 200 or 0) - (love.keyboard.isDown("left") and 200 or 0), (love.keyboard.isDown("down") and 200 or 0) - (love.keyboard.isDown("up") and 200 or 0)
-    player.x, player.y = player.x + dx / speedModifier * dt, player.y + dy / speedModifier * dt
+    if currentscene == 1 then
 
-    -- Frame collision
-    local frameLeft = frame.x
-    local frameRight = frame.x + frame.width 
-    local frameTop = frame.y
-    local frameBottom = frame.y + frame.height
-    if player.x < frameLeft + frame.thickness * 2 + 4 then
-        player.x = frameLeft + frame.thickness * 2 + 4 
-    elseif player.x > frameRight - frame.thickness * 2 + - 4 then
-        player.x = frameRight - frame.thickness * 2 + - 4
+        if love.keyboard.isDown("right") and not keyDownMenu.right then
+            player.buttonselected = (player.buttonselected + 1)%4
+            keyDownMenu.right = true
+        elseif not love.keyboard.isDown("right") then
+            keyDownMenu.right = false
+        end
+    
+        if love.keyboard.isDown("left") and not keyDownMenu.left then
+            player.buttonselected = (player.buttonselected - 1)%4
+            keyDownMenu.left = true
+        elseif not love.keyboard.isDown("left") then
+            keyDownMenu.left = false
+        end
+
+        
+        local currentx
+        if player.buttonselected == 0 then
+            currentx = 33 + 16
+        elseif player.buttonselected == 1 then
+            currentx = 187 + 16
+        elseif player.buttonselected == 2 then
+            currentx = 345 + 16
+        elseif player.buttonselected == 3 then
+            currentx = 499 + 16
+        end
+        player.x = currentx
+        player.y = 452
     end
-    if player.y < frameTop + frame.thickness * 2 + 4 then
-        player.y = frameTop + frame.thickness * 2 + 4
-    elseif player.y > frameBottom - frame.thickness * 2 - 4 then
-        player.y = frameBottom - frame.thickness * 2 + - 4
+
+    if currentscene == 2 then
+        -- Player movement
+        local speedModifier = love.keyboard.isDown("x") and 2 or 1
+        local dx, dy = (love.keyboard.isDown("right") and 200 or 0) - (love.keyboard.isDown("left") and 200 or 0), (love.keyboard.isDown("down") and 200 or 0) - (love.keyboard.isDown("up") and 200 or 0)
+        player.x, player.y = player.x + dx / speedModifier * dt, player.y + dy / speedModifier * dt
+
+        -- Frame collision
+        local frameLeft = frame.x
+        local frameRight = frame.x + frame.width 
+        local frameTop = frame.y
+        local frameBottom = frame.y + frame.height
+        if player.x < frameLeft + frame.thickness * 2 + 4 then
+            player.x = frameLeft + frame.thickness * 2 + 4 
+        elseif player.x > frameRight - frame.thickness * 2 - 4 then
+            player.x = frameRight - frame.thickness * 2 - 4
+        end
+        if player.y < frameTop + frame.thickness * 2 + 4 then
+            player.y = frameTop + frame.thickness * 2 + 4
+        elseif player.y > frameBottom - frame.thickness * 2 - 4 then
+            player.y = frameBottom - frame.thickness * 2 - 4
+        end
     end
 end
 
@@ -42,10 +77,17 @@ function love.draw()
     love.graphics.draw(love.graphics.newImage("background.png"), 15, 15)
 
     -- buttons
-    love.graphics.draw(love.graphics.newImage("1false.png"), 33, 431)
-    love.graphics.draw(love.graphics.newImage("0false.png"), 187, 431)
-    love.graphics.draw(love.graphics.newImage("2false.png"), 345, 431)
-    love.graphics.draw(love.graphics.newImage("3false.png"), 499, 431)
+    if currentscene == 2 then
+        love.graphics.draw(love.graphics.newImage("0false.png"), 33, 431)
+        love.graphics.draw(love.graphics.newImage("1false.png"), 187, 431)
+        love.graphics.draw(love.graphics.newImage("2false.png"), 345, 431)
+        love.graphics.draw(love.graphics.newImage("3false.png"), 499, 431)
+    elseif currentscene ~= 2 then
+        love.graphics.draw(love.graphics.newImage("0" .. (player.buttonselected == 0 and "true" or "false") .. ".png"), 33, 431)
+        love.graphics.draw(love.graphics.newImage("1" .. (player.buttonselected == 1 and "true" or "false") .. ".png"), 187, 431)
+        love.graphics.draw(love.graphics.newImage("2" .. (player.buttonselected == 2 and "true" or "false") .. ".png"), 345, 431)
+        love.graphics.draw(love.graphics.newImage("3" .. (player.buttonselected == 3 and "true" or "false") .. ".png"), 499, 431)
+    end
     
     -- name
     love.graphics.setColor(namefont.color)
@@ -84,6 +126,12 @@ function love.draw()
     love.graphics.rectangle("fill", frame.x, frame.y + frame.height - frame.thickness, frame.width, frame.thickness) -- Bottom
     love.graphics.rectangle("fill", frame.x, frame.y + frame.thickness, frame.thickness, frame.height - 2 * frame.thickness) -- Left
     love.graphics.rectangle("fill", frame.x + frame.width - frame.thickness, frame.y + frame.thickness, frame.thickness, frame.height - 2 * frame.thickness) -- Right
+
+    -- menu text
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.setFont(love.graphics.newFont("dtsans.ttf", 30))
+    love.graphics.print((function(text, speed, index, x) local s = "" for i = 1, math.min(index, #text) do s = s .. text:sub(i, i) end if love.timer.getTime() / speed >= #text + x * speed then index = 1 end return s end)("*  He looks tired. . .", 0.1, math.floor(love.timer.getTime() / 0.2), 400), 50, 266)
+
 
     -- soul (player)
     love.graphics.draw(player.image, player.x - 8, player.y - 8)

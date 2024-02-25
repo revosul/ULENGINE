@@ -49,7 +49,7 @@ function love.update(dt)
 end
 
 function love.draw()
-
+    
     -- buttons
     love.graphics.draw(love.graphics.newImage("1false.png"), 33, 431)
     love.graphics.draw(love.graphics.newImage("0false.png"), 187, 431)
@@ -61,13 +61,15 @@ function love.draw()
     love.graphics.setFont(namefont.font)
     love.graphics.print(player.name, 30, 400)
     love.graphics.print("lv " .. player.lv, 132, 400)
+    love.graphics.print(((player.hp < 10) and "0" or "") .. math.floor(player.hp) .. " / " .. player.mhp, 266 + player.mhp * 1.22 + 38 * player.kr, 400)
+
 
     -- hp
     love.graphics.setColor(hpfont.color)
     love.graphics.setFont(hpfont.font)
     love.graphics.print("hp", 225, 406)
     if player.kr == 1 then
-        love.graphics.print("kr", 266 + player.mhp * 1.22, 406)
+        love.graphics.print("kr", 264 + player.mhp * 1.22, 406)
     end
 
     -- hp bar

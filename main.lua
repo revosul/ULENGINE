@@ -78,10 +78,10 @@ function love.draw()
     
     -- enemy
     love.graphics.setColor(1, 1, 1)
-    love.graphics.draw(love.graphics.newImage("sanslegs" .. targetlegsexpress .. ".png"), targetx - 46, 174, 0, 2, 2)
-    love.graphics.draw(love.graphics.newImage("sanstorso" .. targettorsoexpress .. ".png"), targetx - 50 + 1.75 * math.sin(love.timer.getTime() * 2), 128, 0 + 0.03 * math.sin(love.timer.getTime() * 2), 2, 2)
-    love.graphics.draw(love.graphics.newImage("sanshead" .. targetexpression .. ".png"), targetx - 30 + 2 * math.sin(love.timer.getTime() * 2), 80 + 3 * math.sin(love.timer.getTime() * 2), 0, 2, 2)
-    love.graphics.draw(love.graphics.newImage("sanssweat" .. targetsweat .. ".png"), targetx - 30 + 2 * math.sin(love.timer.getTime() * 2), 80 + 3 * math.sin(love.timer.getTime() * 2), 0, 2, 2)
+    love.graphics.draw(love.graphics.newImage("sanslegs" .. targetlegsexpress .. ".png"), targetx - 46, 184, 0, 2, 2)
+    love.graphics.draw(love.graphics.newImage("sanstorso" .. targettorsoexpress .. ".png"), targetx - 50 + 1.75 * math.sin(love.timer.getTime() * 2), 138, 0 + 0.03 * math.sin(love.timer.getTime() * 2), 2, 2)
+    love.graphics.draw(love.graphics.newImage("sanshead" .. targetexpression .. ".png"), targetx - 30 + 2 * math.sin(love.timer.getTime() * 2), 90 + 3 * math.sin(love.timer.getTime() * 2), 0, 2, 2)
+    love.graphics.draw(love.graphics.newImage("sanssweat" .. targetsweat .. ".png"), targetx - 30 + 2 * math.sin(love.timer.getTime() * 2), 90 + 3 * math.sin(love.timer.getTime() * 2), 0, 2, 2)
 
     -- frame (battle box)
     love.graphics.setColor(0, 0, 0, 0.8)

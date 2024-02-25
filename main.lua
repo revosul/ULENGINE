@@ -1,7 +1,7 @@
 local namefont = {font = love.graphics.newFont("mnc.ttf", 24), color = {1, 1, 1}} -- font of the name under the box (you know what im talking about)
 local hpfont = {font = love.graphics.newFont("hp.ttf", 10), color = {1, 1, 1}}
 local player = {x = 320, y = 240, image = love.graphics.newImage("playersoul.png"), name = ("chara"), lv = ("19"), hp = (92), mhp = (92), kr = (1)} -- this is the player
-local targetFPS, targetx, targetexpression, targettorsoexpress, targetlegsexpress, targetsweat = 60, 320, "wince", "idle", "idle", "2" -- some things got mixed in here, but its the fps and enemy expression stuff
+local targetFPS, targetx, targetexpression, targettorsoexpress, targetlegsexpress, targetsweat = 30, 320, "wince", "idle", "idle", "2" -- some things got mixed in here, but its the fps and enemy expression stuff
 local frame = {x = 32, y = 250, width = 577, height = 140, thickness = 5} -- this is the box
 
 function love.load()
@@ -11,25 +11,15 @@ function love.load()
 end
 
 function love.update(dt)
+    -- Limit frame rate to 60 FPS
+    love.timer.sleep(1 / targetFPS - dt)
 
-    -- the fullscreen toggle, if you can figure out a way to make a better one. please do
-    function love.keypressed(key, scancode, isrepeat)
-        if key == "f4" then
-            fullscreen = not fullscreen
-            love.window.setFullscreen(fullscreen, "exclusive")
-        end
-    end
-
-    -- fps controller
-    local frameTime = 1 / targetFPS
-    love.timer.sleep(math.max(0, frameTime - dt))
-
-    -- player movement
+    -- Player movement
     local speedModifier = love.keyboard.isDown("x") and 2 or 1
-    local dx, dy = (love.keyboard.isDown("right") and 6 or 0) - (love.keyboard.isDown("left") and 6 or 0), (love.keyboard.isDown("down") and 5 or 0) - (love.keyboard.isDown("up") and 5 or 0)
-    player.x, player.y = player.x + dx / speedModifier, player.y + dy / speedModifier
+    local dx, dy = (love.keyboard.isDown("right") and 200 or 0) - (love.keyboard.isDown("left") and 200 or 0), (love.keyboard.isDown("down") and 200 or 0) - (love.keyboard.isDown("up") and 200 or 0)
+    player.x, player.y = player.x + dx / speedModifier * dt, player.y + dy / speedModifier * dt
 
-    -- frame collision
+    -- Frame collision
     local frameLeft = frame.x
     local frameRight = frame.x + frame.width 
     local frameTop = frame.y
@@ -81,10 +71,10 @@ function love.draw()
     
     -- enemy
     love.graphics.setColor(1, 1, 1)
-    love.graphics.draw(love.graphics.newImage("sanslegs" .. targetlegsexpress .. ".png"), targetx - 46, 184, 0, 2, 2)
-    love.graphics.draw(love.graphics.newImage("sanstorso" .. targettorsoexpress .. ".png"), targetx - 50 + 1.75 * math.sin(love.timer.getTime() * 2), 138, 0 + 0.03 * math.sin(love.timer.getTime() * 2), 2, 2)
-    love.graphics.draw(love.graphics.newImage("sanshead" .. targetexpression .. ".png"), targetx - 30 + 2 * math.sin(love.timer.getTime() * 2), 90 + 3 * math.sin(love.timer.getTime() * 2), 0, 2, 2)
-    love.graphics.draw(love.graphics.newImage("sanssweat" .. targetsweat .. ".png"), targetx - 30 + 2 * math.sin(love.timer.getTime() * 2), 90 + 3 * math.sin(love.timer.getTime() * 2), 0, 2, 2)
+    love.graphics.draw(love.graphics.newImage("sanslegs" .. targetlegsexpress .. ".png"), targetx - 46, 194, 0, 2, 2)
+    love.graphics.draw(love.graphics.newImage("sanstorso" .. targettorsoexpress .. ".png"), targetx - 50 + 1.75 * math.sin(love.timer.getTime() * 2), 148, 0 + 0.03 * math.sin(love.timer.getTime() * 2), 2, 2)
+    love.graphics.draw(love.graphics.newImage("sanshead" .. targetexpression .. ".png"), targetx - 30 + 2 * math.sin(love.timer.getTime() * 2), 100 + 3 * math.sin(love.timer.getTime() * 2), 0, 2, 2)
+    love.graphics.draw(love.graphics.newImage("sanssweat" .. targetsweat .. ".png"), targetx - 30 + 2 * math.sin(love.timer.getTime() * 2), 100 + 3 * math.sin(love.timer.getTime() * 2), 0, 2, 2)
 
     -- frame (battle box)
     love.graphics.setColor(0, 0, 0, 0.8)

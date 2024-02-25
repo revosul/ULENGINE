@@ -54,7 +54,7 @@ function love.draw()
     love.graphics.draw(love.graphics.newImage("1false.png"), 33, 431)
     love.graphics.draw(love.graphics.newImage("0false.png"), 187, 431)
     love.graphics.draw(love.graphics.newImage("2false.png"), 345, 431)
-    love.graphics.draw(love.graphics.newImage("3false.png"), 500, 431)
+    love.graphics.draw(love.graphics.newImage("3false.png"), 499, 431)
     
     -- name
     love.graphics.setColor(namefont.color)

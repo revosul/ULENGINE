@@ -1,6 +1,6 @@
 local namefont = {font = love.graphics.newFont("mnc.ttf", 24), color = {1, 1, 1}} -- font of the name under the box (you know what im talking about)
 local hpfont = {font = love.graphics.newFont("hp.ttf", 10), color = {1, 1, 1}}
-local player = {x = 320, y = 240, image = love.graphics.newImage("playersoul.png"), name = ("chara"), lv = ("19"), hp = (1), mhp = (92), kr = (1)} -- this is the player
+local player = {x = 320, y = 240, image = love.graphics.newImage("playersoul.png"), name = ("chara"), lv = ("19"), hp = (92), mhp = (92), kr = (1)} -- this is the player
 local targetFPS, targetx, targetexpression, targettorsoexpress, targetlegsexpress, targetsweat = 30, 320, "wince", "idle", "idle", "2" -- some things got mixed in here, but its the fps and enemy expression stuff
 local frame = {x = 33, y = 250, width = 575, height = 140, thickness = 5} -- this is the box
 
@@ -19,8 +19,6 @@ function love.update(dt)
             love.window.setFullscreen(fullscreen, "exclusive")
         end
     end
-
-    player.hp = 46 + 46 * math.sin(love.timer.getTime() * 2)
 
     -- fps controller
     local frameTime = 1 / targetFPS
@@ -61,7 +59,7 @@ function love.draw()
     love.graphics.setFont(namefont.font)
     love.graphics.print(player.name, 30, 400)
     love.graphics.print("lv " .. player.lv, 132, 400)
-    love.graphics.print(((player.hp < 10) and "0" or "") .. math.floor(player.hp) .. " / " .. player.mhp, 266 + player.mhp * 1.22 + 38 * player.kr, 400)
+    love.graphics.print(((player.hp < 10) and "0" or "") .. math.floor(player.hp) .. " / " .. player.mhp, 266 + player.mhp * 1.22 + 38, 400)
 
 
     -- hp

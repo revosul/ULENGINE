@@ -4,7 +4,7 @@ local frame = {x = 35, y = 250, width = 570, height = 130, thickness = 5}
 
 function love.load()
     love.window.setMode(640, 480)
-    love.window.setTitle("rlengine")
+    love.window.setTitle("ulengine")
     love.graphics.setDefaultFilter("nearest", "nearest")
 end
 

@@ -72,7 +72,7 @@ function love.update(dt)
 end
 
 function love.draw()
-    
+
     -- background
     love.graphics.draw(love.graphics.newImage("background.png"), 15, 15)
 
@@ -129,9 +129,44 @@ function love.draw()
 
     -- menu text
     love.graphics.setColor(1, 1, 1)
-    love.graphics.setFont(love.graphics.newFont("dtsans.ttf", 30))
-    love.graphics.print((function(text, speed, index, x) local s = "" for i = 1, math.min(index, #text) do s = s .. text:sub(i, i) end if love.timer.getTime() / speed >= #text + x * speed then index = 1 end return s end)("*  He looks tired. . .", 0.1, math.floor(love.timer.getTime() / 0.2), 400), 50, 266)
-
+    love.graphics.setFont(love.graphics.newFont("DTM-Mono.otf", 26))
+    
+    local text = "*  He looks tired... i wonder why? hahah, coding is pain, please help me."
+    local speed = 0.1
+    local wrapX = 530 -- Set the x position where text should wrap
+    local index = math.floor(love.timer.getTime() / speed)
+    
+    local function typeText(text, speed, index, wrapX)
+        local s = ""
+        local lineWidth = 0
+        local words = {}
+        for word in text:gmatch("%S+") do
+            table.insert(words, word)
+        end
+        local wordIndex = 1
+        while wordIndex <= #words and index > 0 do
+            local word = words[wordIndex]
+            local wordWidth = love.graphics.getFont():getWidth(word)
+            if lineWidth + wordWidth > wrapX then
+                s = s .. "\n"
+                lineWidth = 0
+            end
+            if index >= #word + 1 then
+                s = s .. word .. " "
+                lineWidth = lineWidth + wordWidth + love.graphics.getFont():getWidth(" ")
+                index = index - #word - 1
+                wordIndex = wordIndex + 1
+            else
+                local partialWord = word:sub(1, index)
+                s = s .. partialWord
+                lineWidth = lineWidth + love.graphics.getFont():getWidth(partialWord)
+                index = 0
+            end
+        end
+        return s
+    end
+    
+    love.graphics.print(typeText(text, speed, index, wrapX), 55, 266)
 
     -- soul (player)
     love.graphics.draw(player.image, player.x - 8, player.y - 8)

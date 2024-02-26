@@ -2,10 +2,13 @@ local namefont = {font = love.graphics.newFont("mnc.ttf", 24), colour = {1, 1, 1
 local hpfont = {font = love.graphics.newFont("hp.ttf", 10), colour = {1, 1, 1}}
 local menufont = {font = love.graphics.newFont("DTM-Mono.otf", 26), colour = {1, 1, 1}}
 local player = {x = 320, y = 240, image = love.graphics.newImage("playersoul.png"), name = ("chara"), lv = ("19"), hp = (92), mhp = (92), kr = (1), krl = (0), buttonselected = 0} -- this is the player
-local targetFPS, targetx, targetexpression, targettorsoexpress, targetlegsexpress, targetsweat = 60, 320, "wince", "idle", "idle", "2" -- some things got mixed in here, but its the fps and enemy expression stuff
+local targetFPS, targetx, targetexpression, targettorsoexpress, targetlegsexpress, targetsweat, targetname = 60, 320, "wince", "idle", "idle", "2", "Sans" -- some things got mixed in here, but its the fps and enemy expression stuff
 local frame = {x = 32, y = 250, width = 577, height = 140, thickness = 5} -- this is the box
 local currentscene = 1
-local keyDownMenu = {left = false, right = false}
+local keyDownMenu = {left = false, right = false, z = false, x = false}
+local targetWidth = 0
+local textTimer = 0  
+local textUtils = require("textUtils")
 
 function love.load()
     love.window.setMode(640, 480) -- size of game window
@@ -14,19 +17,21 @@ function love.load()
 end
 
 function love.update(dt)
-
-    if love.keyboard.isDown("w") then
-        player.hp = player.hp + 1
-    elseif love.keyboard.isDown("s") then
-        player.hp = player.hp - 1
+    textTimer = textTimer + dt
+    
+    if currentscene == 1 and love.keyboard.isDown("z") and not keyDownMenu.z then
+        currentscene = currentscene * 10 + player.buttonselected
+        keyDownMenu.z = true
+    end
+    
+    if not love.keyboard.isDown("z") then
+        keyDownMenu.z = false
     end
 
-    function love.keypressed(key)
-        if key == "f4" then
-            local fullscreen = love.window.getFullscreen()
-            love.window.setFullscreen(not fullscreen, "exclusive")
-        end
+    if not love.keyboard.isDown("x") then
+        keyDownMenu.x = false
     end
+
     -- Limit frame rate to 60 FPS
     love.timer.sleep(1 / targetFPS - dt)
 
@@ -59,6 +64,84 @@ function love.update(dt)
         end
         player.x = currentx
         player.y = 452
+        
+    end
+
+    if currentscene == 10 then
+        player.x = 63
+        player.y =282
+
+        if love.keyboard.isDown("x") and not keyDownMenu.x then
+            currentscene = 1
+            keyDownMenu.x = true
+        end
+        if love.keyboard.isDown("z") and not keyDownMenu.z then
+            currentscene = 102
+            keyDownMenu.z = true
+        end
+    end
+
+    if currentscene == 102 then
+        player.x = -25
+        player.y =282
+
+        if targetWidth ~= 1 then
+            targetWidth = math.min(1, targetWidth + dt * (1 - targetWidth) * 4)
+        end
+
+        if targetWidth > 1 then 
+            targetWidth = 1
+        end
+
+        if love.keyboard.isDown("z") and not keyDownMenu.z then
+            currentscene = 103
+            keyDownMenu.z = true
+        end
+    end
+
+    if currentscene ~=102 then
+        targetWidth = targetWidth - 3 * dt
+        if targetWidth < 0 then
+            targetWidth = 0
+        end
+    end
+
+    if currentscene == 11 then
+        player.x = 63
+        player.y =282
+
+        if love.keyboard.isDown("x") and not keyDownMenu.x then
+            currentscene = 1
+            keyDownMenu.x = true
+        end
+        if love.keyboard.isDown("z") and not keyDownMenu.z then
+            currentscene = 112
+            keyDownMenu.z = true
+        end
+    end
+
+    if currentscene == 112 then
+        player.x = 63
+        player.y =282
+
+        if love.keyboard.isDown("x") and not keyDownMenu.x then
+            currentscene = 11
+            keyDownMenu.x = true
+        end
+        if love.keyboard.isDown("z") and not keyDownMenu.z then
+            currentscene = 113
+            keyDownMenu.z = true
+        end
+    end
+
+    if currentscene == 113 then
+        player.x = -25
+        player.y =282
+
+        if love.keyboard.isDown("z") and not keyDownMenu.z then
+            currentscene = 3
+            keyDownMenu.z = true
+        end
     end
 
     if currentscene == 2 then
@@ -83,6 +166,34 @@ function love.update(dt)
             player.y = frameBottom - frame.thickness * 2 - 4
         end
     end
+
+    if player.hp > player.mhp then
+        player.hp = player.mhp
+    end
+
+    if player.krl > 0 and player.kr ~= 1 then
+        player.krl = 0
+    elseif player.krl > 0 then
+        player.krl = player.krl - 2 * dt
+    end
+
+    if player.krl + player.hp > player.mhp then
+        player.krl = player.mhp - player.hp
+    end
+
+    if player.krl < 0 then
+        player.krl = 0
+    end
+
+end
+
+function love.keypressed(key)
+    if key == "z" then
+        textTimer = 0
+    elseif key == "f4" then
+        local fullscreen = love.window.getFullscreen()
+        love.window.setFullscreen(not fullscreen, "exclusive")
+    end
 end
 
 function love.draw()
@@ -91,7 +202,7 @@ function love.draw()
     love.graphics.draw(love.graphics.newImage("background.png"), 15, 15)
 
     -- buttons
-    if currentscene == 2 then
+    if currentscene == 2 or currentscene == 113 or currentscene == 102 or currentscene == 103 then
         love.graphics.draw(love.graphics.newImage("0false.png"), 33, 431)
         love.graphics.draw(love.graphics.newImage("1false.png"), 187, 431)
         love.graphics.draw(love.graphics.newImage("2false.png"), 345, 431)
@@ -108,8 +219,10 @@ function love.draw()
     love.graphics.setFont(namefont.font)
     love.graphics.print(player.name, 30, 400)
     love.graphics.print("lv " .. player.lv, 132, 400)
-    love.graphics.print(((player.hp < 10) and "0" or "") .. math.floor(player.hp) .. " / " .. player.mhp, 266 + player.mhp * 1.22 + 38, 400)
-
+    if player.krl + player.hp > player.hp then
+        love.graphics.setColor(250, 0, 255)
+    end
+    love.graphics.print(((player.hp + player.krl < 10) and "0" or "") .. math.floor(player.hp + player.krl) .. " / " .. player.mhp, 266 + player.mhp * 1.22 + 10 + 28 * player.kr, 400)
 
     -- hp
     love.graphics.setColor(hpfont.colour)
@@ -123,7 +236,7 @@ function love.draw()
     love.graphics.setColor(191, 0, 0)
     love.graphics.rectangle("fill", 256, 400, player.mhp * 1.22, 20)
     love.graphics.setColor(250, 0, 255)
-    love.graphics.rectangle("fill", 256, 400, player.hp + player.krl * 1.22, 20)
+    love.graphics.rectangle("fill", 256 + player.hp * 1.22, 400, player.krl * 1.22, 20)
     love.graphics.setColor(255, 245, 0)
     love.graphics.rectangle("fill", 256, 400, player.hp * 1.22, 20)
     
@@ -143,46 +256,58 @@ function love.draw()
     love.graphics.rectangle("fill", frame.x, frame.y + frame.thickness, frame.thickness, frame.height - 2 * frame.thickness) -- Left
     love.graphics.rectangle("fill", frame.x + frame.width - frame.thickness, frame.y + frame.thickness, frame.thickness, frame.height - 2 * frame.thickness) -- Right
 
+    local targetsprite = love.graphics.newImage("target.png")
+    local desiredWidth = 562 * targetWidth
+    local scale = desiredWidth / targetsprite:getWidth()
+    local frameCenterX = frame.x + frame.width / 2
+    local frameCenterY = frame.y + frame.height / 2
+    local spriteWidth = targetsprite:getWidth() * scale
+    local spriteHeight = targetsprite:getHeight()
+    local spriteX = frameCenterX - spriteWidth / 2
+    local spriteY = frameCenterY - spriteHeight / 2
+    love.graphics.setColor(1, 1, 1, targetWidth)
+    love.graphics.draw(targetsprite, spriteX, spriteY, 0, scale, 1)
+
     -- menu text
-    love.graphics.setColor(menufont.colour)
-    love.graphics.setFont(menufont.font)
-    
-    local text = "*  Sans is trying his best not to freak out."
-    local speed = 0.1
-    local wrapX = 530 -- Set the x position where text should wrap
-    local index = math.floor(love.timer.getTime() / speed)
-    
-    local function typeText(text, speed, index, wrapX)
-        local s = ""
-        local lineWidth = 0
-        local words = {}
-        for word in text:gmatch("%S+") do
-            table.insert(words, word)
-        end
-        local wordIndex = 1
-        while wordIndex <= #words and index > 0 do
-            local word = words[wordIndex]
-            local wordWidth = love.graphics.getFont():getWidth(word)
-            if lineWidth + wordWidth > wrapX then
-                s = s .. "\n"
-                lineWidth = 0
-            end
-            if index >= #word + 1 then
-                s = s .. word .. " "
-                lineWidth = lineWidth + wordWidth + love.graphics.getFont():getWidth(" ")
-                index = index - #word - 1
-                wordIndex = wordIndex + 1
-            else
-                local partialWord = word:sub(1, index)
-                s = s .. partialWord
-                lineWidth = lineWidth + love.graphics.getFont():getWidth(partialWord)
-                index = 0
-            end
-        end
-        return s
+    if currentscene~= 1 and currentscene ~= 113 then
+        textTimer = 0
+        index = 0
+        
     end
-    
-    love.graphics.print(typeText(text, speed, index, wrapX), 55, 266)
+
+    if currentscene == 11 or currentscene == 10 then
+        love.graphics.setColor(menufont.colour)
+        love.graphics.setFont(menufont.font)
+        love.graphics.print("  * " .. targetname, 55, 266)
+    end
+
+    if currentscene == 112 then
+        love.graphics.setColor(menufont.colour)
+        love.graphics.setFont(menufont.font)
+        love.graphics.print("  * Check", 55, 266)
+    end
+
+    if currentscene == 113 then
+        love.graphics.setColor(menufont.colour)
+        love.graphics.setFont(menufont.font)
+        local text = "*  Sans 1 ATK 1 DEF."
+        local speed = 0.05
+        local wrapX = 530
+        local index = math.floor(textTimer / speed)
+        local formattedText = textUtils.typeText(menufont.font, text, speed, index, wrapX)
+        love.graphics.print(formattedText, 55, 266)
+    end
+
+    if currentscene == 1 then
+        love.graphics.setColor(menufont.colour)
+        love.graphics.setFont(menufont.font)
+        local text = "* Your sins weigh heavy on your soul..."
+        local speed = 0.05
+        local wrapX = 530
+        local index = math.floor(textTimer / speed)
+        local formattedText = textUtils.typeText(menufont.font, text, speed, index, wrapX)
+        love.graphics.print(formattedText, 55, 266)
+    end
 
     -- soul (player)
     love.graphics.draw(player.image, player.x - 8, player.y - 8)

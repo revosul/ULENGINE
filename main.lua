@@ -1,7 +1,8 @@
-local namefont = {font = love.graphics.newFont("mnc.ttf", 24), color = {1, 1, 1}} -- font of the name under the box (you know what im talking about)
-local hpfont = {font = love.graphics.newFont("hp.ttf", 10), color = {1, 1, 1}}
-local player = {x = 320, y = 240, image = love.graphics.newImage("playersoul.png"), name = ("chara"), lv = ("19"), hp = (92), mhp = (92), kr = (1), buttonselected = 0} -- this is the player
-local targetFPS, targetx, targetexpression, targettorsoexpress, targetlegsexpress, targetsweat = 30, 320, "wince", "idle", "idle", "2" -- some things got mixed in here, but its the fps and enemy expression stuff
+local namefont = {font = love.graphics.newFont("mnc.ttf", 24), colour = {1, 1, 1}} -- font of the name under the box (you know what im talking about)
+local hpfont = {font = love.graphics.newFont("hp.ttf", 10), colour = {1, 1, 1}}
+local menufont = {font = love.graphics.newFont("DTM-Mono.otf", 26), colour = {1, 1, 1}}
+local player = {x = 320, y = 240, image = love.graphics.newImage("playersoul.png"), name = ("chara"), lv = ("19"), hp = (92), mhp = (92), kr = (1), krl = (0), buttonselected = 0} -- this is the player
+local targetFPS, targetx, targetexpression, targettorsoexpress, targetlegsexpress, targetsweat = 60, 320, "wince", "idle", "idle", "2" -- some things got mixed in here, but its the fps and enemy expression stuff
 local frame = {x = 32, y = 250, width = 577, height = 140, thickness = 5} -- this is the box
 local currentscene = 1
 local keyDownMenu = {left = false, right = false}
@@ -13,6 +14,19 @@ function love.load()
 end
 
 function love.update(dt)
+
+    if love.keyboard.isDown("w") then
+        player.hp = player.hp + 1
+    elseif love.keyboard.isDown("s") then
+        player.hp = player.hp - 1
+    end
+
+    function love.keypressed(key)
+        if key == "f4" then
+            local fullscreen = love.window.getFullscreen()
+            love.window.setFullscreen(not fullscreen, "exclusive")
+        end
+    end
     -- Limit frame rate to 60 FPS
     love.timer.sleep(1 / targetFPS - dt)
 
@@ -90,7 +104,7 @@ function love.draw()
     end
     
     -- name
-    love.graphics.setColor(namefont.color)
+    love.graphics.setColor(namefont.colour)
     love.graphics.setFont(namefont.font)
     love.graphics.print(player.name, 30, 400)
     love.graphics.print("lv " .. player.lv, 132, 400)
@@ -98,7 +112,7 @@ function love.draw()
 
 
     -- hp
-    love.graphics.setColor(hpfont.color)
+    love.graphics.setColor(hpfont.colour)
     love.graphics.setFont(hpfont.font)
     love.graphics.print("hp", 225, 406)
     if player.kr == 1 then
@@ -106,9 +120,11 @@ function love.draw()
     end
 
     -- hp bar
-    love.graphics.setColor(1, 0, 0)
+    love.graphics.setColor(191, 0, 0)
     love.graphics.rectangle("fill", 256, 400, player.mhp * 1.22, 20)
-    love.graphics.setColor(1, 1, 0)
+    love.graphics.setColor(250, 0, 255)
+    love.graphics.rectangle("fill", 256, 400, player.hp + player.krl * 1.22, 20)
+    love.graphics.setColor(255, 245, 0)
     love.graphics.rectangle("fill", 256, 400, player.hp * 1.22, 20)
     
     -- enemy
@@ -128,10 +144,10 @@ function love.draw()
     love.graphics.rectangle("fill", frame.x + frame.width - frame.thickness, frame.y + frame.thickness, frame.thickness, frame.height - 2 * frame.thickness) -- Right
 
     -- menu text
-    love.graphics.setColor(1, 1, 1)
-    love.graphics.setFont(love.graphics.newFont("DTM-Mono.otf", 26))
+    love.graphics.setColor(menufont.colour)
+    love.graphics.setFont(menufont.font)
     
-    local text = "*  He looks tired... i wonder why? hahah, coding is pain, please help me."
+    local text = "*  Sans is trying his best not to freak out."
     local speed = 0.1
     local wrapX = 530 -- Set the x position where text should wrap
     local index = math.floor(love.timer.getTime() / speed)
@@ -170,4 +186,12 @@ function love.draw()
 
     -- soul (player)
     love.graphics.draw(player.image, player.x - 8, player.y - 8)
+
+    --fps
+    if love.keyboard.isDown("f") then
+        love.graphics.setColor(namefont.colour)
+        love.graphics.setFont(namefont.font)
+        love.graphics.print("FPS: " .. tostring(math.floor(1/love.timer.getDelta())), 3, 0)
+    end
+
 end

@@ -10,6 +10,7 @@ local targetWidth = 0
 local textTimer = 0  
 local textUtils = require("textUtils")
 local music
+local items = {i1 = "Pie", i2 = "F.Steak", i3 = "I.noodles"}
 
 function love.load()
     love.window.setMode(640, 480) -- size of game window
@@ -204,6 +205,7 @@ end
 function love.keypressed(key)
     if key == "z" then
         textTimer = 0
+        keyDownMenu.z = false
     elseif key == "f4" then
         local fullscreen = love.window.getFullscreen()
         love.window.setFullscreen(not fullscreen, "exclusive")

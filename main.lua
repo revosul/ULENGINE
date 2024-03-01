@@ -2,21 +2,27 @@ local namefont = {font = love.graphics.newFont("mnc.ttf", 24), colour = {1, 1, 1
 local hpfont = {font = love.graphics.newFont("hp.ttf", 10), colour = {1, 1, 1}}
 local menufont = {font = love.graphics.newFont("DTM-Mono.otf", 26), colour = {1, 1, 1}}
 local player = {x = 320, y = 240, image = love.graphics.newImage("playersoul.png"), name = ("chara"), lv = ("19"), hp = (92), mhp = (92), kr = (1), krl = (0), buttonselected = 0} -- this is the player
-local targetFPS, targetx, targetexpression, targettorsoexpress, targetlegsexpress, targetsweat, targetname = 60, 320, "wince", "idle", "idle", "2", "Sans" -- some things got mixed in here, but its the fps and enemy expression stuff
+local targetFPS, targetx, targetexpression, targettorsoexpress, targetlegsexpress, targetsweat, targetname = 60, 320, "mad", "idle", "idle", "2", "Sans" -- some things got mixed in here, but its the fps and enemy expression stuff
 local frame = {x = 32, y = 250, width = 577, height = 140, thickness = 5} -- this is the box
 local currentscene = 1
 local keyDownMenu = {left = false, right = false, z = false, x = false}
 local targetWidth = 0
 local textTimer = 0  
 local textUtils = require("textUtils")
+local music
 
 function love.load()
     love.window.setMode(640, 480) -- size of game window
     love.window.setTitle("luaengine") -- title of the window
     love.graphics.setDefaultFilter("nearest", "nearest") -- to make sure the pixilart doesnt blur
+
+    music = love.audio.newSource("MeGaLoVaNiA.mp3", "stream") -- this is placeholder music
+    music:setLooping(true)
+    love.audio.play(music)
 end
 
 function love.update(dt)
+
     textTimer = textTimer + dt
     
     if currentscene == 1 and love.keyboard.isDown("z") and not keyDownMenu.z then
@@ -24,6 +30,14 @@ function love.update(dt)
         keyDownMenu.z = true
     end
     
+    if love.keyboard.isDown("2") then
+        currentscene = 2
+    end
+
+    if love.keyboard.isDown("1") then
+        currentscene = 1
+    end
+
     if not love.keyboard.isDown("z") then
         keyDownMenu.z = false
     end
@@ -198,11 +212,13 @@ end
 
 function love.draw()
 
+    love.graphics.setColor(1, 1, 1)
+
     -- background
     love.graphics.draw(love.graphics.newImage("background.png"), 15, 15)
 
     -- buttons
-    if currentscene == 2 or currentscene == 113 or currentscene == 102 or currentscene == 103 then
+    if currentscene == 2 or currentscene == 113 or currentscene == 102 or currentscene == 103 or currentscene == 3 then
         love.graphics.draw(love.graphics.newImage("0false.png"), 33, 431)
         love.graphics.draw(love.graphics.newImage("1false.png"), 187, 431)
         love.graphics.draw(love.graphics.newImage("2false.png"), 345, 431)
@@ -268,6 +284,11 @@ function love.draw()
     love.graphics.setColor(1, 1, 1, targetWidth)
     love.graphics.draw(targetsprite, spriteX, spriteY, 0, scale, 1)
 
+    if currentscene == 103 or currentscene == 3 then
+        player.x = frameCenterX
+        player.y = frameCenterY
+    end
+
     -- menu text
     if currentscene~= 1 and currentscene ~= 113 then
         textTimer = 0
@@ -296,9 +317,7 @@ function love.draw()
         local index = math.floor(textTimer / speed)
         local formattedText = textUtils.typeText(menufont.font, text, speed, index, wrapX)
         love.graphics.print(formattedText, 55, 266)
-    end
-
-    if currentscene == 1 then
+    elseif currentscene == 1 then
         love.graphics.setColor(menufont.colour)
         love.graphics.setFont(menufont.font)
         local text = "* Your sins weigh heavy on your soul..."
@@ -310,6 +329,7 @@ function love.draw()
     end
 
     -- soul (player)
+    love.graphics.setColor(1, 1, 1, 1 - targetWidth)
     love.graphics.draw(player.image, player.x - 8, player.y - 8)
 
     --fps

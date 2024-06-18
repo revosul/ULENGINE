@@ -1,34 +1,41 @@
-local namefont = {font = love.graphics.newFont("mnc.ttf", 24), colour = {1, 1, 1}} -- font of the name under the box (you know what im talking about)
-local hpfont = {font = love.graphics.newFont("hp.ttf", 10), colour = {1, 1, 1}}
-local menufont = {font = love.graphics.newFont("DTM-Mono.otf", 26), colour = {1, 1, 1}}
-local player = {x = 320, y = 240, image = love.graphics.newImage("playersoul.png"), name = ("chara"), lv = ("19"), hp = (92), mhp = (92), kr = (1), krl = (0), buttonselected = 0} -- this is the player
-local targetFPS, targetx, targetexpression, targettorsoexpress, targetlegsexpress, targetsweat, targetname = 60, 320, "mad", "idle", "idle", "2", "Sans" -- some things got mixed in here, but its the fps and enemy expression stuff
+local namefont = {font = love.graphics.newFont("assets/fonts/mnc.ttf", 24), colour = {1, 1, 1}} -- font of the name under the box (you know what im talking about)
+local hpfont = {font = love.graphics.newFont("assets/fonts/hp.ttf", 10), colour = {1, 1, 1}}
+local menufont = {font = love.graphics.newFont("assets/fonts/DTM-Mono.otf", 26), colour = {1, 1, 1}}
+local player = {x = 320, y = 240, image = love.graphics.newImage("assets/images/playersoul.png"), name = ("chara"), lv = ("19"), hp = (46), mhp = (92), kr = (1), krl = (46), buttonselected = 0, itemselected = 1, itempage = 0} -- this is the player
+local targetFPS, targetx, targetexpression, targettorsoexpress, targetlegsexpress, targetsweat, targetname = 30, 320, "mad", "idle", "idle", "2", "Sans" -- some things got mixed in here, but its the fps and enemy expression stuff
 local frame = {x = 32, y = 250, width = 577, height = 140, thickness = 5} -- this is the box
 local currentscene = 1
-local keyDownMenu = {left = false, right = false, z = false, x = false}
+local keyDownMenu = {left = false, right = false, z = false, x = false, down = false, up = false}
 local targetWidth = 0
 local textTimer = 0  
 local textUtils = require("textUtils")
 local music
-local items = {i1 = "Pie", i2 = "F.Steak", i3 = "I.noodles"}
+local itemlist = {n1 = "Butterscotch Pie", n2 = "Face Steak", n3 = "Instant Noodles", n4 = "Snowman Piece", n5 = "Snowman Piece", n6 = "Legendary Hero", n7 = "Legenday Hero", n8 = "Legendary Hero"}
+local items = {i1 = itemlist.n1, i2 = itemlist.n2, i3 = itemlist.n3}
+local maxitems
+
 
 function love.load()
     love.window.setMode(640, 480) -- size of game window
     love.window.setTitle("luaengine") -- title of the window
     love.graphics.setDefaultFilter("nearest", "nearest") -- to make sure the pixilart doesnt blur
 
-    music = love.audio.newSource("MeGaLoVaNiA.mp3", "stream") -- this is placeholder music
+    music = love.audio.newSource("assets/sounds/HOMERO SIMPSON.mp3", "stream") -- this is placeholder music
     music:setLooping(true)
     love.audio.play(music)
 end
 
 function love.update(dt)
 
+    maxitems = calculateMaxItems(itemlist)
+
     textTimer = textTimer + dt
     
     if currentscene == 1 and love.keyboard.isDown("z") and not keyDownMenu.z then
         currentscene = currentscene * 10 + player.buttonselected
         keyDownMenu.z = true
+        player.itemselected = 1
+        player.itempage = 0
     end
     
     if love.keyboard.isDown("2") then
@@ -51,6 +58,10 @@ function love.update(dt)
     love.timer.sleep(1 / targetFPS - dt)
 
     if currentscene == 1 then
+
+        if player.itemselected ~= 1 then
+            player.itemselected = 1
+        end
 
         if love.keyboard.isDown("right") and not keyDownMenu.right then
             player.buttonselected = (player.buttonselected + 1)%4
@@ -159,6 +170,74 @@ function love.update(dt)
         end
     end
 
+    if currentscene == 12 then
+        if maxitems == 0 then
+            currentscene = 1
+        end
+
+        player.x = 63
+        if player.itemselected == 1 then
+            player.y = 282
+        end
+
+        items.i1 = itemlist["n" .. (1 + player.itempage)]
+        items.i2 = itemlist["n" .. (2 + player.itempage)]
+        items.i3 = itemlist["n" .. (3 + player.itempage)]
+
+        if love.keyboard.isDown("down") and not keyDownMenu.down then
+            if player.itemselected ~= maxitems then
+                player.itemselected = player.itemselected + 1
+            end
+            if player.y == 352 then
+                if itemlist["n" .. (4 + player.itempage)] ~= itemlist["n" .. (maxitems + 1)] then
+                    player.itempage = player.itempage + 1
+                end
+            end 
+            if player.y == 316 then
+                player.y = 352
+            end
+            if player.y == 282 then
+                player.y = 316
+            end
+            keyDownMenu.down = true
+        elseif not love.keyboard.isDown("down") then
+            keyDownMenu.down = false
+        end
+
+        if love.keyboard.isDown("up") and not keyDownMenu.up then
+            if player.itemselected ~= 1 then 
+                player.itemselected = player.itemselected - 1
+            end
+            if player.itemselected < 1 then
+                player.itemselected = 1
+            end
+            if player.y == 282 then
+                if player.itempage > 0 then
+                    player.itempage = player.itempage - 1
+                end                
+            end
+            if player.y == 316 then
+                player.y = 282
+            end
+            if player.y == 352 then
+                player.y = 316
+            end
+            keyDownMenu.up = true
+        elseif not love.keyboard.isDown("up") then
+            keyDownMenu.up = false
+        end
+        
+
+        if love.keyboard.isDown("x") and not keyDownMenu.x then
+            currentscene = 1
+            keyDownMenu.x = true
+        end
+        if love.keyboard.isDown("z") and not keyDownMenu.z then
+            currentscene = 122
+            keyDownMenu.z = true
+        end
+    end
+
     if currentscene == 2 then
         -- Player movement
         local speedModifier = love.keyboard.isDown("x") and 2 or 1
@@ -212,24 +291,34 @@ function love.keypressed(key)
     end
 end
 
+function calculateMaxItems(itemlist)
+    local count = 0
+    for key, value in pairs(itemlist) do
+        if key:sub(1, 1) == "n" then
+            count = count + 1
+        end
+    end
+    return count
+end
+
 function love.draw()
 
     love.graphics.setColor(1, 1, 1)
 
     -- background
-    love.graphics.draw(love.graphics.newImage("background.png"), 15, 15)
+    love.graphics.draw(love.graphics.newImage("assets/images/background.png"), 15, 15)
 
     -- buttons
     if currentscene == 2 or currentscene == 113 or currentscene == 102 or currentscene == 103 or currentscene == 3 then
-        love.graphics.draw(love.graphics.newImage("0false.png"), 33, 431)
-        love.graphics.draw(love.graphics.newImage("1false.png"), 187, 431)
-        love.graphics.draw(love.graphics.newImage("2false.png"), 345, 431)
-        love.graphics.draw(love.graphics.newImage("3false.png"), 499, 431)
+        love.graphics.draw(love.graphics.newImage("assets/images/ui/buttons/0false.png"), 33, 431)
+        love.graphics.draw(love.graphics.newImage("assets/images/ui/buttons/1false.png"), 187, 431)
+        love.graphics.draw(love.graphics.newImage("assets/images/ui/buttons/2false.png"), 345, 431)
+        love.graphics.draw(love.graphics.newImage("assets/images/ui/buttons/3false.png"), 499, 431)
     elseif currentscene ~= 2 then
-        love.graphics.draw(love.graphics.newImage("0" .. (player.buttonselected == 0 and "true" or "false") .. ".png"), 33, 431)
-        love.graphics.draw(love.graphics.newImage("1" .. (player.buttonselected == 1 and "true" or "false") .. ".png"), 187, 431)
-        love.graphics.draw(love.graphics.newImage("2" .. (player.buttonselected == 2 and "true" or "false") .. ".png"), 345, 431)
-        love.graphics.draw(love.graphics.newImage("3" .. (player.buttonselected == 3 and "true" or "false") .. ".png"), 499, 431)
+        love.graphics.draw(love.graphics.newImage("assets/images/ui/buttons/0" .. (player.buttonselected == 0 and "true" or "false") .. ".png"), 33, 431)
+        love.graphics.draw(love.graphics.newImage("assets/images/ui/buttons/1" .. (player.buttonselected == 1 and "true" or "false") .. ".png"), 187, 431)
+        love.graphics.draw(love.graphics.newImage("assets/images/ui/buttons/2" .. (player.buttonselected == 2 and "true" or "false") .. ".png"), 345, 431)
+        love.graphics.draw(love.graphics.newImage("assets/images/ui/buttons/3" .. (player.buttonselected == 3 and "true" or "false") .. ".png"), 499, 431)
     end
     
     -- name
@@ -260,10 +349,12 @@ function love.draw()
     
     -- enemy
     love.graphics.setColor(1, 1, 1)
-    love.graphics.draw(love.graphics.newImage("sanslegs" .. targetlegsexpress .. ".png"), targetx - 46, 194, 0, 2, 2)
-    love.graphics.draw(love.graphics.newImage("sanstorso" .. targettorsoexpress .. ".png"), targetx - 50 + 1.75 * math.sin(love.timer.getTime() * 2), 148, 0 + 0.03 * math.sin(love.timer.getTime() * 2), 2, 2)
-    love.graphics.draw(love.graphics.newImage("sanshead" .. targetexpression .. ".png"), targetx - 30 + 2 * math.sin(love.timer.getTime() * 2), 100 + 3 * math.sin(love.timer.getTime() * 2), 0, 2, 2)
-    love.graphics.draw(love.graphics.newImage("sanssweat" .. targetsweat .. ".png"), targetx - 30 + 2 * math.sin(love.timer.getTime() * 2), 100 + 3 * math.sin(love.timer.getTime() * 2), 0, 2, 2)
+    -- love.graphics.draw( drawable, x, y, r, sx, sy, ox, oy, kx, ky )
+
+    love.graphics.draw(love.graphics.newImage("assets/images/enemy/sanslegs" .. targetlegsexpress .. ".png"), targetx - 40, 190, 0, 2, 2, 0)
+    love.graphics.draw(love.graphics.newImage("assets/images/enemy/sanstorso" .. targettorsoexpress .. ".png"), targetx - 50 + 0.75 * math.sin(love.timer.getTime() * 2.5), 150 + -0.75 * math.sin(love.timer.getTime() * 5), 0, 2, 2)
+    love.graphics.draw(love.graphics.newImage("assets/images/enemy/sanshead" .. targetexpression .. ".png"), targetx - 26 + 1 * math.sin(love.timer.getTime() * 2.5), 105 + -1 * math.sin(love.timer.getTime() * 5), 0, 2, 2)
+    love.graphics.draw(love.graphics.newImage("assets/images/enemy/sanssweat" .. targetsweat .. ".png"), targetx - 26 + 1 * math.sin(love.timer.getTime() * 2.5), 105 + -1 * math.sin(love.timer.getTime() * 5), 0, 2, 2)
 
     -- frame (battle box)
     love.graphics.setColor(0, 0, 0, 0.8)
@@ -274,7 +365,7 @@ function love.draw()
     love.graphics.rectangle("fill", frame.x, frame.y + frame.thickness, frame.thickness, frame.height - 2 * frame.thickness) -- Left
     love.graphics.rectangle("fill", frame.x + frame.width - frame.thickness, frame.y + frame.thickness, frame.thickness, frame.height - 2 * frame.thickness) -- Right
 
-    local targetsprite = love.graphics.newImage("target.png")
+    local targetsprite = love.graphics.newImage("assets/images/ui/attack/target.png")
     local desiredWidth = 562 * targetWidth
     local scale = desiredWidth / targetsprite:getWidth()
     local frameCenterX = frame.x + frame.width / 2
@@ -322,12 +413,21 @@ function love.draw()
     elseif currentscene == 1 then
         love.graphics.setColor(menufont.colour)
         love.graphics.setFont(menufont.font)
-        local text = "* Your sins weigh heavy on your soul..."
+        local text = "* The quick brown fox jumps over a lazy dog."
         local speed = 0.05
         local wrapX = 530
         local index = math.floor(textTimer / speed)
         local formattedText = textUtils.typeText(menufont.font, text, speed, index, wrapX)
         love.graphics.print(formattedText, 55, 266)
+    end
+
+    if currentscene == 12 then
+        love.graphics.setColor(menufont.colour)
+        love.graphics.setFont(menufont.font)
+        love.graphics.print("  * ".. items.i1 .."", 55, 266)
+        love.graphics.print("  * ".. items.i2 .."", 55, 300)
+        love.graphics.print("  * ".. items.i3 .."", 55, 336)
+        love.graphics.print("".. player.itemselected .." / " .. maxitems .. "", 500, 336)
     end
 
     -- soul (player)

@@ -2,7 +2,7 @@ local namefont = {font = love.graphics.newFont("assets/fonts/mnc.ttf", 24), colo
 local hpfont = {font = love.graphics.newFont("assets/fonts/hp.ttf", 10), colour = {1, 1, 1}}
 local menufont = {font = love.graphics.newFont("assets/fonts/DTM-Mono.otf", 26), colour = {1, 1, 1}}
 local player = {x = 320, y = 240, image = love.graphics.newImage("assets/images/playersoul.png"), name = ("chara"), lv = ("19"), hp = (46), mhp = (92), kr = (1), krl = (46), buttonselected = 0, itemselected = 1, itempage = 0} -- this is the player
-local targetFPS, targetx, targetexpression, targettorsoexpress, targetlegsexpress, targetsweat, targetname = 30, 320, "mad", "idle", "idle", "2", "Sans" -- some things got mixed in here, but its the fps and enemy expression stuff
+local targetx, targetexpression, targettorsoexpress, targetlegsexpress, targetsweat, targetname = 320, "mad", "idle", "idle", "2", "Sans" -- some things got mixed in here, but its the fps and enemy expression stuff
 local frame = {x = 32, y = 250, width = 577, height = 140, thickness = 5} -- this is the box
 local currentscene = 1
 local keyDownMenu = {left = false, right = false, z = false, x = false, down = false, up = false}
@@ -13,6 +13,7 @@ local music
 local itemlist = {n1 = "Butterscotch Pie", n2 = "Face Steak", n3 = "Instant Noodles", n4 = "Snowman Piece", n5 = "Snowman Piece", n6 = "Legendary Hero", n7 = "Legenday Hero", n8 = "Legendary Hero"}
 local items = {i1 = itemlist.n1, i2 = itemlist.n2, i3 = itemlist.n3}
 local maxitems
+local targetFPS = 60
 
 
 function love.load()
@@ -351,10 +352,10 @@ function love.draw()
     love.graphics.setColor(1, 1, 1)
     -- love.graphics.draw( drawable, x, y, r, sx, sy, ox, oy, kx, ky )
 
-    love.graphics.draw(love.graphics.newImage("assets/images/enemy/sanslegs" .. targetlegsexpress .. ".png"), targetx - 40, 190, 0, 2, 2, 0)
-    love.graphics.draw(love.graphics.newImage("assets/images/enemy/sanstorso" .. targettorsoexpress .. ".png"), targetx - 50 + 0.75 * math.sin(love.timer.getTime() * 2.5), 150 + -0.75 * math.sin(love.timer.getTime() * 5), 0, 2, 2)
-    love.graphics.draw(love.graphics.newImage("assets/images/enemy/sanshead" .. targetexpression .. ".png"), targetx - 26 + 1 * math.sin(love.timer.getTime() * 2.5), 105 + -1 * math.sin(love.timer.getTime() * 5), 0, 2, 2)
-    love.graphics.draw(love.graphics.newImage("assets/images/enemy/sanssweat" .. targetsweat .. ".png"), targetx - 26 + 1 * math.sin(love.timer.getTime() * 2.5), 105 + -1 * math.sin(love.timer.getTime() * 5), 0, 2, 2)
+    love.graphics.draw(love.graphics.newImage("assets/images/enemy/sanslegs" .. targetlegsexpress .. ".png"), targetx - 40, 180, 0, 2, 2, 0)
+    love.graphics.draw(love.graphics.newImage("assets/images/enemy/sanstorso" .. targettorsoexpress .. ".png"), targetx - 50 + 0.75 * math.sin(love.timer.getTime() * 2.5), 140 + -0.75 * math.sin(love.timer.getTime() * 5), 0, 2, 2)
+    love.graphics.draw(love.graphics.newImage("assets/images/enemy/sanshead" .. targetexpression .. ".png"), targetx - 26 + 1 * math.sin(love.timer.getTime() * 2.5), 95 + -1 * math.sin(love.timer.getTime() * 5), 0, 2, 2)
+    love.graphics.draw(love.graphics.newImage("assets/images/enemy/sanssweat" .. targetsweat .. ".png"), targetx - 26 + 1 * math.sin(love.timer.getTime() * 2.5), 95 + -1 * math.sin(love.timer.getTime() * 5), 0, 2, 2)
 
     -- frame (battle box)
     love.graphics.setColor(0, 0, 0, 0.8)
@@ -413,7 +414,7 @@ function love.draw()
     elseif currentscene == 1 then
         love.graphics.setColor(menufont.colour)
         love.graphics.setFont(menufont.font)
-        local text = "* The quick brown fox jumps over a lazy dog."
+        local text = "* Flavour text."
         local speed = 0.05
         local wrapX = 530
         local index = math.floor(textTimer / speed)
